@@ -1,0 +1,26 @@
+services:
+  frankenphp:
+    build:
+      context: php/
+      dockerfile: Dockerfile
+    container_name: frankenphp-container
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./php/app:/app
+  mysql:
+    build:
+      context: mysql/
+      dockerfile: Dockerfile
+    container_name: mysql-container
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: user
+      MYSQL_USER: app_user
+      MYSQL_PASSWORD: app_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./mysql/conf.d:/etc/mysql/conf.d
