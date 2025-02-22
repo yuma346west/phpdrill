@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     container_name: frankenphp-container
     ports:
-      - "8080:8080"
+      - "8000:8000"
     volumes:
       - ./php/app:/app
   mysql:
