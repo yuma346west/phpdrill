@@ -77,7 +77,7 @@ resource "aws_security_group" "my_sg" {
 
 # Route53 Hosted Zoneの作成
 resource "aws_route53_zone" "bluemandrill" {
-  name = "bluemandrill.com" # ドメイン名を指定
+  name = "bluemandrill.xyz" # ドメイン名を指定
   tags = {
     Name = "bluemandrill-hosted-zone"
   }
@@ -93,4 +93,41 @@ resource "aws_route53_record" "bluemandrill_record" {
   records = [
     "192.0.2.1", # 指定するIPアドレス
   ]
+}
+
+
+# ECRリポジトリの作成
+resource "aws_ecr_repository" "my_ecr" {
+  name = "phpdrill-repo"
+
+  tags = {
+    Name = "phpdrill-ecr"
+  }
+}
+resource "aws_ecr_lifecycle_policy" "my_ecr_lifecycle_policy" {
+  repository = aws_ecr_repository.my_ecr.name
+
+  policy = file("resources/ecr_lifecycle_policy.json")
+}
+
+data "aws_iam_policy_document" "ecr_policy" {
+  statement {
+    actions = [
+      "ecr:GetDownloadUrlForLayer",
+      "ecr:BatchGetImage",
+      "ecr:BatchCheckLayerAvailability",
+      "ecr:PutImage",
+      "ecr:InitiateLayerUpload",
+      "ecr:UploadLayerPart",
+      "ecr:CompleteLayerUpload"
+    ]
+    resources = [aws_ecr_repository.my_ecr.arn]
+    effect    = "Allow"
+  }
+}
+
+resource "aws_iam_policy" "ecr_access_policy" {
+  name        = "ecr-access-policy"
+  description = "Allow ECR Pull/Push for specific repository"
+  policy      = data.aws_iam_policy_document.ecr_policy.json
 }
