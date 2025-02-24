@@ -1,0 +1,8 @@
+%% システム構成概要（新構成）
+graph TD
+    User[ユーザー] -->|接続| DNS[DNSルーティング<br>Route53]
+    DNS -->|トラフィック分散| LB[ロードバランサ<br>ALB/NLB]
+    LB -->|リクエスト送信| API[ECSタスク<br>APIサーバ]
+    API -->|読み書き| DB[RDS<br>データベース]
+    API -->|操作| Storage[S3<br>ストレージ]
+    Storage -->|静的ファイル配信| CDN[CDN<br>CloudFront]

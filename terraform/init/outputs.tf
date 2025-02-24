@@ -9,7 +9,3 @@ output "subnet_id" {
   value       = aws_subnet.my_subnet.id
 }
 
-output "ec2_public_ip" {
-  description = "EC2インスタンスのパブリックIP"
-  value       = aws_instance.my_instance.public_ip
-}

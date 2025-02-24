@@ -75,15 +75,22 @@ resource "aws_security_group" "my_sg" {
   }
 }
 
-# EC2インスタンスの作成
-resource "aws_instance" "my_instance" {
-  ami           = var.ami_id
-  instance_type = "t2.micro"
-  subnet_id     = aws_subnet.my_subnet.id
-  security_groups = [
-    aws_security_group.my_sg.name
-  ]
+# Route53 Hosted Zoneの作成
+resource "aws_route53_zone" "bluemandrill" {
+  name = "bluemandrill.com" # ドメイン名を指定
   tags = {
-    Name = "phpdrill-ec2-instance"
+    Name = "bluemandrill-hosted-zone"
   }
+}
+
+# Route53 レコードの作成 (Aレコード)
+resource "aws_route53_record" "bluemandrill_record" {
+  zone_id = aws_route53_zone.bluemandrill.zone_id # Hosted Zone IDを指定
+  name    = "www"
+  type    = "A"
+  ttl     = 300 # DNSキャッシュの有効期間
+
+  records = [
+    "192.0.2.1", # 指定するIPアドレス
+  ]
 }
