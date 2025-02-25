@@ -212,4 +212,45 @@ resource "aws_vpc_endpoint" "s3" {
     Name = "phpdrill-s3-endpoint"
   }
 }
+resource "aws_vpc_endpoint" "cloudwatch_logs" {
+  vpc_id              = aws_vpc.my_vpc.id
+  service_name        = "com.amazonaws.ap-northeast-1.logs"
+  vpc_endpoint_type   = "Interface"
+  private_dns_enabled = true
+  subnet_ids          = [aws_subnet.my_subnet_a.id]
 
+  security_group_ids = [
+    aws_security_group.my_sg.id
+  ]
+}
+
+
+# VPC内で通信を許可するセキュリティグループを作成 (ソースセキュリティグループによる設定)
+# セキュリティグループの定義
+resource "aws_security_group" "phpdrill_internal" {
+  vpc_id = aws_vpc.my_vpc.id
+
+  tags = {
+    Name = "phpdrill_internal"
+  }
+}
+
+# インバウンドルールの定義
+resource "aws_security_group_rule" "internal_ingress" {
+  type              = "ingress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  security_group_id = aws_security_group.phpdrill_internal.id
+  source_security_group_id = aws_security_group.phpdrill_internal.id
+}
+
+# アウトバウンドルールの定義
+resource "aws_security_group_rule" "internal_egress" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  security_group_id = aws_security_group.phpdrill_internal.id
+  cidr_blocks       = ["0.0.0.0/0"]
+}

@@ -39,7 +39,7 @@ module "alb" {
 
   alb_name                  = "${var.project_name}-alb"
   target_group_name         = "${var.project_name}-php-tg"
-  target_port               = 8080
+  target_port               = 8000
   listener_port             = 80
   listener_protocol         = "HTTP"
   security_groups           = [data.aws_security_group.phpdrill_sg.id]

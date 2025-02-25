@@ -1,3 +1,9 @@
+data "aws_security_group" "internal_sg" {
+  filter {
+    name = "tag:Name"
+    values = ["phpdrill_internal"] # セキュリティグループ名に基づくフィルタリング
+  }
+}
 resource "aws_ecs_cluster" "cluster" {
   name = "${var.app_name}-cluster"
 }
@@ -20,7 +26,7 @@ resource "aws_ecs_service" "service" {
   launch_type     = var.launch_type
   network_configuration {
     subnets          = var.subnets
-    security_groups  = var.security_groups
+    security_groups  = concat(var.security_groups, [data.aws_security_group.internal_sg.id])
     assign_public_ip = var.assign_public_ip
   }
   load_balancer {
@@ -29,3 +35,16 @@ resource "aws_ecs_service" "service" {
     container_port   = var.container_port
   }
 }
+
+# CloudWatch Logs グループの作成
+resource "aws_cloudwatch_log_group" "php_phpdrill" {
+  name              = "/ecs/phpdrill"  # ロググループ名
+  retention_in_days = 30              # ログの保持期間（日数）
+
+  tags = {
+    Environment = "production"
+    Application = "phpdrill"
+  }
+}
+
+

@@ -5,6 +5,14 @@
     "cpu": 256,
     "memory": 512,
     "essential": true,
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "/ecs/phpdrill",
+        "awslogs-region": "ap-northeast-1",
+        "awslogs-stream-prefix": "ecs"
+      }
+    },
     "portMappings": [
       {
         "containerPort": 8000,

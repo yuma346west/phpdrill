@@ -1,9 +1,17 @@
+# phpdrill-security-group を取得
+data "aws_security_group" "internal_sg" {
+  filter {
+    name = "tag:Name"
+    values = ["phpdrill_internal"] # セキュリティグループ名に基づくフィルタリング
+  }
+}
+
 # ALBの作成
 resource "aws_lb" "this" {
   name               = var.alb_name
   internal           = var.internal_alb
   load_balancer_type = "application"
-  security_groups    = var.security_groups
+  security_groups    = concat(var.security_groups, [data.aws_security_group.internal_sg.id])
   subnets            = var.subnet_ids
   enable_deletion_protection = var.enable_deletion_protection
 
@@ -15,6 +23,26 @@ resource "aws_lb" "this" {
   )
 }
 
+
+# ALBリスナーの作成
+resource "aws_lb_listener" "php_listener" {
+  load_balancer_arn = aws_lb.this.arn
+  port              = var.listener_port
+  protocol          = var.listener_protocol
+
+  default_action {
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Service Unavailable"
+      status_code  = "503"
+    }
+  }
+  # default_action {
+  #   type             = "forward"
+  #   target_group_arn = aws_lb_target_group.php_tg.arn
+  # }
+}
 # ALBターゲットグループの作成
 resource "aws_lb_target_group" "php_tg" {
   name        = var.target_group_name
@@ -38,16 +66,23 @@ resource "aws_lb_target_group" "php_tg" {
       Name = var.target_group_name
     }
   )
+
+  depends_on = [aws_lb_listener.php_listener]
 }
 
-# ALBリスナーの作成
-resource "aws_lb_listener" "php_listener" {
-  load_balancer_arn = aws_lb.this.arn
-  port              = var.listener_port
-  protocol          = var.listener_protocol
+# リスナールールの作成
+resource "aws_lb_listener_rule" "php_rule" {
+  listener_arn = aws_lb_listener.php_listener.arn
+  priority     = 100  # 優先順位を設定（1-50000の間）
 
-  default_action {
+  action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.php_tg.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/*"]  # 全てのパスをターゲットグループに転送
+    }
   }
 }
