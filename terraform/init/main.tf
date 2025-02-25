@@ -37,19 +37,35 @@ resource "aws_route_table" "my_route_table" {
 }
 
 # サブネットの作成
-resource "aws_subnet" "my_subnet" {
+resource "aws_subnet" "my_subnet_a" {
   vpc_id                  = aws_vpc.my_vpc.id
   cidr_block              = "10.0.1.0/24"
   availability_zone       = var.public_subnet_az1
   map_public_ip_on_launch = true
   tags = {
-    Name = "phpdrill-subnet"
+    Name = "phpdrill-subnet_a"
+  }
+}
+
+# サブネットの作成
+resource "aws_subnet" "my_subnet_c" {
+  vpc_id                  = aws_vpc.my_vpc.id
+  cidr_block              = "10.0.2.0/24"
+  availability_zone       = var.public_subnet_az2
+  map_public_ip_on_launch = true
+  tags = {
+    Name = "phpdrill-subnet_c"
   }
 }
 
 # サブネットにルートテーブルを関連付ける
 resource "aws_route_table_association" "my_route_table_association" {
-  subnet_id      = aws_subnet.my_subnet.id
+  subnet_id      = aws_subnet.my_subnet_a.id
+  route_table_id = aws_route_table.my_route_table.id
+}
+# サブネットにルートテーブルを関連付ける
+resource "aws_route_table_association" "my_route_table_association2" {
+  subnet_id      = aws_subnet.my_subnet_c.id
   route_table_id = aws_route_table.my_route_table.id
 }
 
@@ -59,6 +75,18 @@ resource "aws_security_group" "my_sg" {
   ingress {
     from_port   = 22
     to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    from_port   = 80
+    to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -131,3 +159,57 @@ resource "aws_iam_policy" "ecr_access_policy" {
   description = "Allow ECR Pull/Push for specific repository"
   policy      = data.aws_iam_policy_document.ecr_policy.json
 }
+
+
+resource "aws_vpc_endpoint" "ecr_api" {
+  vpc_id            = aws_vpc.my_vpc.id
+  service_name = "com.amazonaws.${var.aws_region}.ecr.api" # ECR APIのサービス名
+  vpc_endpoint_type = "Interface"
+
+  security_group_ids = [aws_security_group.my_sg.id]
+
+  private_dns_enabled = true
+
+  subnet_ids = [
+    aws_subnet.my_subnet_a.id,
+    aws_subnet.my_subnet_c.id
+  ]
+
+  tags = {
+    Name = "phpdrill-ecr-api-endpoint"
+  }
+}
+
+resource "aws_vpc_endpoint" "ecr_dkr" {
+  vpc_id            = aws_vpc.my_vpc.id
+  service_name = "com.amazonaws.${var.aws_region}.ecr.dkr" # ECR Dockerのサービス名
+  vpc_endpoint_type = "Interface"
+
+  private_dns_enabled = true
+
+  security_group_ids = [aws_security_group.my_sg.id]
+
+  subnet_ids = [
+    aws_subnet.my_subnet_a.id,
+    aws_subnet.my_subnet_c.id
+  ]
+
+  tags = {
+    Name = "phpdrill-ecr-dkr-endpoint"
+  }
+}
+
+resource "aws_vpc_endpoint" "s3" {
+  vpc_id            = aws_vpc.my_vpc.id
+  service_name = "com.amazonaws.${var.aws_region}.s3" # S3のサービス名 (ECRがS3を内部的に使用)
+  vpc_endpoint_type = "Gateway"
+
+  route_table_ids = [
+    aws_route_table.my_route_table.id
+  ]
+
+  tags = {
+    Name = "phpdrill-s3-endpoint"
+  }
+}
+

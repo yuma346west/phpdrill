@@ -1,3 +1,7 @@
+provider "aws" {
+  region = var.aws_region
+}
+
 # VPCを取得
 data "aws_vpc" "phpdrill_vpc" {
   filter {
@@ -15,12 +19,21 @@ data "aws_security_group" "phpdrill_sg" {
 }
 
 # phpdrill-subnet を取得
-data "aws_subnet" "phpdrill_subnet" {
+data "aws_subnet" "phpdrill_subnet_a" {
   filter {
     name = "tag:Name"
-    values = ["phpdrill-subnet"] # サブネット名に基づくフィルタリング
+    values = ["phpdrill-subnet_a"] # サブネット名に基づくフィルタリング
   }
 }
+
+# phpdrill-subnet を取得
+data "aws_subnet" "phpdrill_subnet_c" {
+  filter {
+    name = "tag:Name"
+    values = ["phpdrill-subnet_c"] # サブネット名に基づくフィルタリング
+  }
+}
+
 module "alb" {
   source = "../modules/alb" # モジュールが保存されているパス
 
@@ -30,7 +43,7 @@ module "alb" {
   listener_port             = 80
   listener_protocol         = "HTTP"
   security_groups           = [data.aws_security_group.phpdrill_sg.id]
-  subnet_ids                = [data.aws_subnet.phpdrill_subnet.id]
+  subnet_ids                = [data.aws_subnet.phpdrill_subnet_a.id, data.aws_subnet.phpdrill_subnet_c.id]
   vpc_id                    = data.aws_vpc.phpdrill_vpc.id
   internal_alb              = false
   health_check_path         = "/health"
@@ -42,15 +55,15 @@ module "ecs" {
 
   app_name = "${var.project_name}-ecs"
 
-  network_mode = "awcvpc"
+  network_mode = "awsvpc"
 
-  container_name = "myphp"
+  container_name = "php"
 
   container_definitions = file("resources/container_definitions.json")
   execution_role_arn    = var.execution_role_arn
 
   // Networking and Compatibility
-  subnets            = [data.aws_subnet.phpdrill_subnet.id]
+  subnets            = [data.aws_subnet.phpdrill_subnet_a.id, data.aws_subnet.phpdrill_subnet_c.id]
   security_groups    = [data.aws_security_group.phpdrill_sg.id]
   assign_public_ip   = false
 
@@ -62,5 +75,5 @@ module "ecs" {
   desired_count       = 1
   launch_type         = "FARGATE"
   target_group_arn    = module.alb.target_group_arn
-  container_port      = 8080
+  container_port      = 8000
 }

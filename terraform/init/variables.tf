@@ -28,3 +28,7 @@ variable "public_subnet_az1" {
   description = "Public Subnet AZ1"
   type        = string
 }
+variable "public_subnet_az2" {
+  description = "Public Subnet AZ2"
+  type        = string
+}

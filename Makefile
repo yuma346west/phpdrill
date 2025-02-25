@@ -10,3 +10,13 @@ build:
 	docker compose build --no-cache
 login-app:
 	docker compose exec frankenphp sh
+php-clean:
+	docker compose exec frankenphp php artisan config:clear
+	docker compose exec frankenphp php artisan cache:clear
+
+aws-login-configure:
+	aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin 949668659243.dkr.ecr.ap-northeast-1.amazonaws.com
+ecr-push-php:
+	docker build -t phpdrill-repo php
+	docker tag phpdrill-repo:latest 949668659243.dkr.ecr.ap-northeast-1.amazonaws.com/phpdrill-repo:latest
+	docker push 949668659243.dkr.ecr.ap-northeast-1.amazonaws.com/phpdrill-repo:latest

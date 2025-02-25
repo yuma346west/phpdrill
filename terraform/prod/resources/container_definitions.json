@@ -1,14 +1,14 @@
 [
   {
     "name": "php",
-    "image": "myphp:latest",
+    "image": "949668659243.dkr.ecr.ap-northeast-1.amazonaws.com/phpdrill-repo:latest",
     "cpu": 256,
     "memory": 512,
     "essential": true,
     "portMappings": [
       {
-        "containerPort": 8080,
-        "hostPort": 8080
+        "containerPort": 8000,
+        "hostPort": 8000
       }
     ]
   }

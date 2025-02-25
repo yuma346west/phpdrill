@@ -1,24 +1,26 @@
+# AWSリージョン
+variable "aws_region" {
+  description = "AWSのリージョン"
+  type        = string
+  default     = "us-east-1"
+}
+# AWSのアクセスキーID
+variable "aws_access_key" {
+  description = "AWSのアクセスキーID"
+  type        = string
+}
+# AWSのシークレットアクセスキー
+variable "aws_secret_key" {
+  description = "AWSのシークレットアクセスキー"
+  type        = string
+}
+
 variable "project_name" {
   description = "プロジェクトの名前を設定"
   type        = string
 }
 variable "execution_role_arn" {
   description = "タスク用のIAMロールのARN"
-  type        = string
-}
-
-variable "subnets" {
-  description = "対象のサブネットリスト"
-  type        = list(string)
-}
-
-variable "security_groups" {
-  description = "ECSサービスのセキュリティグループ"
-  type        = list(string)
-}
-
-variable "target_group_arn" {
-  description = "ロードバランサーのターゲットグループARN"
   type        = string
 }
 

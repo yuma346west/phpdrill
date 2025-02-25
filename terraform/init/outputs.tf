@@ -6,6 +6,6 @@ output "vpc_id" {
 
 output "subnet_id" {
   description = "作成されたサブネットのID"
-  value       = aws_subnet.my_subnet.id
+  value       = aws_subnet.my_subnet_a.id
 }
 

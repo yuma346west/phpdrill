@@ -85,7 +85,7 @@ variable "health_check_protocol" {
 variable "target_type" {
   description = "ターゲットタイプ (instance, ip, or lambda)"
   type        = string
-  default     = "instance"
+  default     = "ip"
 }
 
 variable "vpc_id" {
