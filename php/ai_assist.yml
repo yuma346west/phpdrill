@@ -1,0 +1,25 @@
+application:
+  name: ResumeGeneratorApp
+  description: A web application for generating cover letters and personal statements for resumes.
+  base_framework: Laravel Octane
+  frontend:
+    framework: Blade
+    description: Utilizes Laravel's built-in Blade templating engine for rendering the frontend.
+  backend:
+    framework: Laravel Octane
+    description: High-performance web server powered by Laravel Octane.
+  database:
+    default: SQLite
+    supported:
+      - SQLite
+      - MySQL
+      - PostgresSQL
+    description: The application is designed to work with SQLite by default but is adaptable to MySQL and PostgresSQL.
+  features:
+    - Profile Input Screen
+    - Results Display Screen
+    - Future integration with external AI generation APIs
+  progress:
+    resume_generation:
+      - profile_input_screen: completed
+      - results_display_screen: completed
