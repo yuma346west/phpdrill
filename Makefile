@@ -9,7 +9,7 @@ down:
 build:
 	docker compose build --no-cache frankenphp
 login-app:
-	docker compose exec frankenphp sh
+	docker compose exec frankenphp bash
 php-clean:
 	docker compose exec frankenphp php artisan config:clear
 	docker compose exec frankenphp php artisan cache:clear
