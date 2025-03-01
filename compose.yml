@@ -9,6 +9,9 @@ services:
       - "8000:8000"
     volumes:
       - ./php/app:/app
+      - ./php/conf/php.ini:/usr/local/etc/php/php.ini
+    environment:
+      PHP_IDE_CONFIG: "serverName=frankenphp"
     tty: true
   mysql:
     build:

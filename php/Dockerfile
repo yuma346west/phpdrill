@@ -7,7 +7,8 @@ RUN install-php-extensions \
     gd \
     intl \
     zip \
-    opcache
+    opcache \
+    xdebug
 
 COPY ./conf/php.ini $PHP_INI_DIR/php.ini
 

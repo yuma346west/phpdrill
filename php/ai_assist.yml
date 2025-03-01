@@ -23,3 +23,6 @@ application:
     resume_generation:
       - profile_input_screen: completed
       - results_display_screen: completed
+
+  models:
+    naming_convention: Model class names are singular and correspond to the table names in the database.
