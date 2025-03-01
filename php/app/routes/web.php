@@ -17,8 +17,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // routes/web.php に追加
-    Route::get('/resume', [ResumeController::class, 'index'])->name('resume');
+    Route::get('/resume', [ResumeController::class, 'show'])->name('resume');
+    Route::get('/resume/result', [ResumeController::class, 'showHash'])->name('resume.result');
+    Route::post('/resume', [ResumeController::class, 'addProfile'])->name('resume.addProfile');
 });
 Route::get('/health', function () {
     return response()->json(['status' => 'OK'], 200);

@@ -4,10 +4,12 @@ services:
       context: php/
       dockerfile: Dockerfile
     container_name: frankenphp-container
+    entrypoint: php artisan octane:frankenphp --workers=1 --max-requests=1
     ports:
       - "8000:8000"
     volumes:
       - ./php/app:/app
+    tty: true
   mysql:
     build:
       context: mysql/

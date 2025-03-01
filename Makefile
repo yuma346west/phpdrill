@@ -13,6 +13,8 @@ login-app:
 php-clean:
 	docker compose exec frankenphp php artisan config:clear
 	docker compose exec frankenphp php artisan cache:clear
+	docker compose exec frankenphp php artisan route:clear
+	docker compose exec frankenphp php artisan view:clear
 
 aws-login-configure:
 	aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin 949668659243.dkr.ecr.ap-northeast-1.amazonaws.com
