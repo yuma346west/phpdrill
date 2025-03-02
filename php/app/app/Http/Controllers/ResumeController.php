@@ -14,6 +14,12 @@ class ResumeController extends Controller
         return view('resume', ['userName' => $userName]);
     }
 
+    /**
+     * Validates and processes the provided data to create a profile, then redirects to the result route.
+     *
+     * @param Request $request The HTTP request containing profile data inputs.
+     * @return RedirectResponse A redirection to the route displaying the profile result.
+     */
     public function addProfile(Request $request): RedirectResponse
     {
         $validated = $request->validate([
