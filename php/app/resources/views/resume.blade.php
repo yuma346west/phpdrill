@@ -7,7 +7,19 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
+                @if(isset($existingResume) && $existingResume)
+                    <div class="mb-6 p-4 bg-yellow-50 border-yellow-400 text-yellow-700">
+                        <p>{{ __('登録済みのデータがあります') }}</p>
+                        <a href="{{ route('resume.result') }}" class="text-blue-600 hover:underline">
+                            {{ __('> 登録内容を確認する') }}
+                        </a>
+                    </div>
+                @endif
+            </div>
+
+            <div class="mt-6 bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
                 <form method="POST" action="/resume" class="space-y-6">
                     @csrf
 

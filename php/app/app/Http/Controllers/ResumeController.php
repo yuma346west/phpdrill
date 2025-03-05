@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\UserResume;
+use App\Service\Resume\AddProfile;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -12,7 +13,13 @@ class ResumeController extends Controller
     public function show(): View
     {
         $userName = auth()->user()->name ?? 'Guest';
-        return view('resume', ['userName' => $userName]);
+
+        $existingResume = UserResume::where('user_id', auth()->user()->id)->first();
+
+        return view('resume', [
+            'userName' => $userName,
+            'existingResume' => $existingResume,
+        ]);
     }
 
     /**
@@ -28,30 +35,19 @@ class ResumeController extends Controller
             'strengths' => 'required|string|max:400',
         ]);
 
-        $uniqueHash = hash('sha256', auth()->user()->email);
+        $added = (new AddProfile())->execute($validated);
 
-        UserResume::create([
-            'user_id' => auth()->user()->id,
-            'name' => $validated['name'],
-            'strengths' => $validated['strengths'],
-        ]);
-
-
-        return redirect()->route('resume.result', [
-            'hash' => $uniqueHash,
-            'name' => $validated['name'],
-            'strengths' => $validated['strengths'],
-        ]);
+        return redirect()->route('resume.result', $added);
     }
 
     public function showHash(Request $request): View
     {
-        $validated = $request->validate([
-            'hash' => 'required|string',
-            'name' => 'required|string|max:50',
-            'strengths' => 'required|string|max:400',
-        ]);
+        $resume = UserResume::where('user_id', auth()->user()->id)->firstOrFail();
 
-        return view('resume.result', $validated);
+        return view('resume.result', [
+            'hash' => $resume->hash,
+            'name' => $resume->name,
+            'strengths' => $resume->strengths,
+        ]);
     }
 }

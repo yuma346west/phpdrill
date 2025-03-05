@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('user_resumes', function (Blueprint $table) {
             $table->id(); // Auto-increment primary key
-            $table->unsignedBigInteger('user_id'); // Foreign key referencing users
+            $table->unsignedBigInteger('user_id')->unique(); // Foreign key referencing users
             $table->string('name', 50); // User's name
             $table->string('strengths', 400); // User's personal strengths
-            $table->string('hash', 64)->unique(); // Unique hash
+            $table->string('hash', 64); // Unique hash
             $table->timestamps(); // created_at and updated_at columns
 
             // Foreign key constraint
