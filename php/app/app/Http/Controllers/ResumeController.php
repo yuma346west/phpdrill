@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\UserResume;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -28,6 +29,14 @@ class ResumeController extends Controller
         ]);
 
         $uniqueHash = hash('sha256', auth()->user()->email);
+
+        UserResume::create([
+            'user_id' => auth()->user()->id,
+            'name' => $validated['name'],
+            'strengths' => $validated['strengths'],
+        ]);
+
+
         return redirect()->route('resume.result', [
             'hash' => $uniqueHash,
             'name' => $validated['name'],
